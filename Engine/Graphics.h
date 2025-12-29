@@ -28,7 +28,7 @@
 #include "Colors.h"
 #include "Surface.h"
 #include "Rect.h"
-
+#include "MathCircle.h"
 class Graphics
 {
 public:

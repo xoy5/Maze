@@ -394,7 +394,7 @@ void Graphics::DrawCircle(const Vei2& pos, float radius, const Color& c, float a
 			float r = vec.x * vec.x + vec.y * vec.y;
 			if (r <= radiusPow2)
 			{
-				float alfa = gm::deg360(gm::rtod(std::atan2(vec.y, vec.x)));
+				float alfa = mc::deg360(mc::rtod(std::atan2(vec.y, vec.x)));
 				if ((angleStart <= angleEnd && angleStart <= alfa && alfa <= angleEnd) ||
 					(angleStart > angleEnd && (alfa >= angleStart || alfa <= angleEnd)))
 				{
@@ -408,7 +408,7 @@ void Graphics::DrawCircle(const Vei2& pos, float radius, const Color& c, float a
 void Graphics::DrawCircleOutline(const Vei2& center, float radius, const Color& c, int thickness, int segments)
 {
 	assert(segments >= 4);
-	const float step = 2.0f * gm::PI / segments;
+	const float step = 2.0f * mc::PI / segments;
 	for (int i = 0; i < segments; i++)
 	{
 		float angle1 = step * i;

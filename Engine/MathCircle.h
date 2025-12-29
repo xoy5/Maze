@@ -24,10 +24,9 @@
 #include "Vec2.h"
 #include "Rect.h"
 
-namespace xoy5
+namespace mc
 {
-	constexpr float PI = 3.1415927; 
-	constexpr Vec2 GRAVITATION = Vec2(0.0f, 200.0f);
+	constexpr float PI = 3.14159f;
 
 	inline float rtod(float radians)
 	{
