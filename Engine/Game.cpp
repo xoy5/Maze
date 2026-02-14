@@ -84,35 +84,12 @@ void Game::ProcessInput()
 
 void Game::UpdateModel(float dt)
 {
-	const RectI boxRect = fontBase.GetRectForText(message, Vei2(posBox));
-	posBox += dir * dt * 200.0f;
-	if (boxRect.left < walls.left)
-	{
-		dir.x = -dir.x;
-		posBox.x = float(walls.left);
-	}
-	else if (boxRect.right > walls.right)
-	{
-		dir.x = -dir.x;
-		posBox.x = float(walls.right - boxRect.GetWidth());
-	}
-	if (boxRect.top < walls.top)
-	{
-		dir.y = -dir.y;
-		posBox.y = float(walls.top);
-	}
-	else if (boxRect.bottom > walls.bottom)
-	{
-		dir.y = -dir.y;
-		posBox.y = float(walls.bottom - boxRect.GetHeight());
-	}
+	
 }
 
 void Game::ComposeFrame()
 {
-	const RectI boxRect = fontBase.GetRectForText(message, Vei2(posBox));
-	gfx.DrawRect(boxRect, Colors::Blue);
-	fontBase.DrawText(message, Vei2(posBox), Colors::White, gfx);
+	
 	// Draw FPS
 	const std::string fpsText = "FPS: " + std::to_string(FPS);
 	fontXs.DrawText(fpsText, Vei2{ 10, 10 }, Colors::White, gfx);

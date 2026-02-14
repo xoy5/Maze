@@ -138,6 +138,9 @@
     <ClInclude Include="CoordinateTransformer.h">
       <Filter>Header Files\Engine\Graphics\2D</Filter>
     </ClInclude>
+    <ClInclude Include="Maze.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">

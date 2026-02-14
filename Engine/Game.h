@@ -32,6 +32,8 @@
 #include "TextBox.h"
 #include "MyMessageBox.h"
 
+
+#include "Maze.h"
 class Game
 {
 public:
@@ -77,9 +79,6 @@ private:
 
 	/********************************/
 	/*  User Variables  */
-	const std::string message = " Chili \nDirectX";
-	const RectI walls = Graphics::GetScreenRect();
-	Vec2 posBox = Vec2(Graphics::GetScreenCenter());
-	Vec2 dir = Vec2{ 1.0, 1.0f };
+	Maze maze;
 	/********************************/
 };
