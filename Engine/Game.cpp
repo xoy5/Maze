@@ -26,9 +26,9 @@
 Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
-	gfx(wnd)
-{
-}
+	gfx(wnd),
+	playerMouse("Files/Images/Sprites/mouse2.bmp", maze.GetEntrancePos(), 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
+{}
 
 void Game::Go()
 {
@@ -55,14 +55,14 @@ void Game::Go()
 
 void Game::ProcessInput()
 {
-////////////// KEYBOARD ///////////////
+	////////////// KEYBOARD ///////////////
 	// Keys
 	while (!wnd.kbd.KeyIsEmpty())
 	{
 		const Keyboard::Event keyPressed = wnd.kbd.ReadKey();
 		if (keyPressed.IsValid() && keyPressed.IsPress())
 		{
-			
+
 		}
 	}
 	// Characters
@@ -70,26 +70,38 @@ void Game::ProcessInput()
 	{
 		const char character = wnd.kbd.ReadChar();
 	}
-///////////////////////////////////////
 
-//////////////// MOUSE ////////////////
+	// Controls
+	Vec2 dir = { 0.0f, 0.0f };
+	if (wnd.kbd.KeyIsPressed('A')) dir += {-1.0f, 0.0f};
+	if (wnd.kbd.KeyIsPressed('D')) dir += {1.0f, 0.0f};
+	if (wnd.kbd.KeyIsPressed('W')) dir += {0.0f, -1.0f};
+	if (wnd.kbd.KeyIsPressed('S')) dir += {0.0f, 1.0f};
+
+	playerMouse.SetDir(dir, maze);
+
+	///////////////////////////////////////
+
+	//////////////// MOUSE ////////////////
 	while (!wnd.mouse.IsEmpty())
 	{
 		const auto e = wnd.mouse.Read();
 		// buttons
 		// editor
 	}
-///////////////////////////////////////
+	///////////////////////////////////////
 }
 
 void Game::UpdateModel(float dt)
 {
-	
+	playerMouse.Update(dt, maze);
 }
 
 void Game::ComposeFrame()
 {
-	
+	maze.Draw(gfx);
+	playerMouse.Draw(gfx);
+
 	// Draw FPS
 	const std::string fpsText = "FPS: " + std::to_string(FPS);
 	fontXs.DrawText(fpsText, Vei2{ 10, 10 }, Colors::White, gfx);

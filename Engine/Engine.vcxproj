@@ -160,6 +160,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MouseCameraController.h" />
     <ClInclude Include="MyMessageBox.h" />
+    <ClInclude Include="PlayerMouse.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />
@@ -252,6 +253,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Chili.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Files\Data\maze.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

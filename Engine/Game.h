@@ -34,6 +34,9 @@
 
 
 #include "Maze.h"
+#include "PlayerMouse.h"
+#include "Character.h"
+
 class Game
 {
 public:
@@ -80,5 +83,6 @@ private:
 	/********************************/
 	/*  User Variables  */
 	Maze maze;
+	PlayerMouse playerMouse;
 	/********************************/
 };

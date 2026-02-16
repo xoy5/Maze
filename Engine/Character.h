@@ -17,8 +17,7 @@ private:
 		StandingRight,
 		StandingUp,
 		StandingDown,
-		Count,
-		NoMove
+		Count
 	};
 
 public:

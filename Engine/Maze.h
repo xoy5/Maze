@@ -1,60 +1,128 @@
 #pragma once
 #include <fstream>
-#include "surface.h"
+#include <assert.h>
+
+#include "Surface.h"
+#include "SpriteEffect.h"
 #include "Graphics.h"
+#include "Rect.h"
+
 class Maze
 {
-private:
+public:
 	enum class Tile
 	{
-		floor,
-		wall,
-		entrance,
-		exit,
-		cheese
+		Floor = 1,
+		Entrance = 2,
+		Exit = 4,
+		Cheese = 8,
+		Wall = 16
 	};
+
 public:
-    Maze()
-    {
-        std::ifstream file("Files/Data/maze.txt");
+	Maze()
+	{
+		for (int i = 0; i < nTilesX * nTilesY; i++)
+		{
+			tiles[i] = Tile::Wall;
+		}
 
-        if (!file.is_open())
-        {
-            return;
-        }
+		std::ifstream file("Files/Data/maze.txt");
+		assert(file, "File Error");
 
-        std::string line;
-        int row = 0;
+		char c;
+		int i = 0;
+		while (file.get(c))
+		{
+			switch (c)
+			{
+			case '\n':
+				i--;
+				break;
+			case 'W':
+				tiles[i] = Tile::Wall;
+				break;
+			case 'C':
+				tiles[i] = Tile::Cheese;
+				break;
+			case 'F':
+				tiles[i] = Tile::Floor;
+				break;
+			case 'E':
+				tiles[i] = Tile::Entrance;
+				break;
+			case 'X':
+				tiles[i] = Tile::Exit;
+				break;
+			}
+			i++;
+		}
+	}
+	void Draw(Graphics& gfx) const
+	{
+		for (int i = 0; i < nTilesX * nTilesY; i++)
+		{
+			switch (tiles[i])
+			{
+			case Tile::Wall:
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteWall, SpriteEffect::Copy{});
+				break;
+			case Tile::Cheese:
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Copy{});
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteCheese, SpriteEffect::Chroma{ Colors::Magenta });
+				break;
+			case Tile::Floor:
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Copy{});
+				break;
+			case Tile::Entrance:
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Green });
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				break;
+			case Tile::Exit:
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Red });
+				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				break;
+			}
+		}
+	}
 
-        while (std::getline(file, line) && row < nY_Tiles)
-        {
-            for (int col = 0; col < nX_Tiles && col < (int)line.length(); ++col)
-            {
-                int index = row * nX_Tiles + col;
+public:
+	std::pair<int, int> GetEntranceTilePos() const
+	{
+		for (int i = 0; i < nTilesX * nTilesY; i++)
+		{
+			if (tiles[i] == Tile::Entrance)
+				return { i % nTilesX, i / nTilesX };
+		}
 
-                switch (line[col])
-                {
-                case 'W': tiles[index] = Tile::wall;     break;
-                case 'E': tiles[index] = Tile::entrance; break;
-                case 'X': tiles[index] = Tile::exit;     break;
-                case 'C': tiles[index] = Tile::cheese;   break;
-                case 'F':
-                default:  tiles[index] = Tile::floor;    break;
-                }
-            }
-            row++;
-        }
-        file.close();
-    }
-    void Draw(Graphics& gfx) const
-    {
+		assert(false, "There is no entrance.");
+	}
+	Vec2 GetEntrancePos() const
+	{
+		return GetTilePosAt(GetEntranceTilePos());
+	}
+	Tile GetTileAt(std::pair<int, int> tilePos) const
+	{
+		return tiles[tilePos.first + tilePos.second * nTilesX];
+	}
+	bool CanEnter(std::pair<int, int> tilePos) const
+	{
+		return bool(int(GetTileAt(tilePos)) & 15); // 15 means that I choose Floor, Entrance, Exit and Cheese
+	}
+	RectF GetTileRectAt(std::pair<int, int> tilePos) const
+	{
+		return RectF(Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) }, float(tileSize), float(tileSize));
+	}
+	Vec2 GetTilePosAt(std::pair<int, int> tilePos) const
+	{
+		return Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) };
+	}
 
-    }
 private:
-	static constexpr int nX_Tiles = 20;
-	static constexpr int nY_Tiles = 15;
+	static constexpr int nTilesX = 20;
+	static constexpr int nTilesY = 15;
 	static constexpr int tileSize = 40;
-	Tile tiles[nX_Tiles * nY_Tiles];
+	Tile tiles[nTilesX * nTilesY];
 
 	Surface spriteCheese = Surface{ "Files/Images/Sprites/cheese.bmp" };
 	Surface spriteWall = Surface{ "Files/Images/Sprites/wall.bmp" };

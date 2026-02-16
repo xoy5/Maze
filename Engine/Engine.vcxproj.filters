@@ -138,8 +138,11 @@
     <ClInclude Include="CoordinateTransformer.h">
       <Filter>Header Files\Engine\Graphics\2D</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerMouse.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
     <ClInclude Include="Maze.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,5 +203,10 @@
     <Image Include="Chili.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Files\Data\maze.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
