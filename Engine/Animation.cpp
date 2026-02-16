@@ -2,7 +2,7 @@
 #include "SpriteEffect.h"
 
 Animation::Animation( int x,int y,int width,int height,int count,
-					  const Surface* sprite,float holdTime,Color chroma )
+					  const Surface* sprite,float holdTime, bool animationPingPong, Color chroma )
 	:
 	sprite( sprite ),
 	holdTime( holdTime ),
@@ -11,6 +11,14 @@ Animation::Animation( int x,int y,int width,int height,int count,
 	for( int i = 0; i < count; i++ )
 	{
 		frames.emplace_back( x + i * width,x + (i + 1) * width,y,y + height );
+	}
+
+	if (animationPingPong)
+	{
+		for (int i = count - 1; i > 0; i--)
+		{
+			frames.emplace_back(x + i * width, x + (i + 1) * width, y, y + height);
+		}
 	}
 }
 

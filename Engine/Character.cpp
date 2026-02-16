@@ -1,83 +1,45 @@
 #include "Character.h"
 
-Character::Character( const Vec2& pos )
+Character::Character(const std::string& spriteFilePath, const Vec2& pos, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
 	:
-	sprite( "Images\\link90x90.bmp" ),
-	pos( pos )
+	sprite(spriteFilePath),
+	pos(pos),
+	width(width),
+	height(height)
 {
-	for( int i = 0; i < (int)Sequence::StandingLeft; i++ )
+	for (int i = 0; i < (int)Sequence::StandingLeft; i++)
 	{
-		animations.emplace_back( Animation( 90,90 * i,90,90,4,&sprite,0.16f ) );
+		animations.emplace_back(Animation(width, height * i, width, height, nFrames, &sprite, frameHoldTime, animationPingPong));
 	}
-	for( int i = (int)Sequence::StandingLeft; i < (int)Sequence::Count; i++ )
+	for (int i = (int)Sequence::StandingLeft; i < (int)Sequence::Count; i++)
 	{
-		animations.emplace_back( Animation( 0,90 * (i-(int)Sequence::StandingLeft),90,90,1,&sprite,0.16f ) );
+		animations.emplace_back(Animation(0, height * (i - (int)Sequence::StandingLeft), width, height, 1, &sprite, frameHoldTime));
 	}
 }
 
-void Character::Draw( Graphics& gfx ) const
+void Character::Draw(Graphics& gfx) const
 {
 	// if effect active, draw sprite replacing opaque pixels with red
-	if( effectActive )
+	if (effectActive)
 	{
-		animations[(int)iCurSequence].Draw( (Vei2)pos,gfx, SpriteEffect::Substitution(Colors::Magenta, Colors::Red));
+		animations[(int)iCurSequence].Draw((Vei2)pos, gfx, SpriteEffect::Substitution(Colors::Magenta, Colors::Red));
 	}
 	else
 	{
-		animations[(int)iCurSequence].Draw((Vei2)pos, gfx, SpriteEffect::Chroma{Colors::Magenta});
+		animations[(int)iCurSequence].Draw((Vei2)pos, gfx, SpriteEffect::Chroma{ Colors::Magenta });
 	}
 }
 
-void Character::SetDirection( const Vec2& dir )
-{
-	if( dir.x > 0.0f )
-	{
-		iCurSequence = Sequence::WalkingRight;
-	}
-	else if( dir.x < 0.0f )
-	{
-		iCurSequence = Sequence::WalkingLeft;
-	}
-	else if( dir.y < 0.0f )
-	{
-		iCurSequence = Sequence::WalkingUp;
-	}
-	else if( dir.y > 0.0f )
-	{
-		iCurSequence = Sequence::WalkingDown;
-	}
-	else
-	{
-		if( vel.x > 0.0f )
-		{
-			iCurSequence = Sequence::StandingRight;
-		}
-		else if( vel.x < 0.0f )
-		{
-			iCurSequence = Sequence::StandingLeft;
-		}
-		else if( vel.y < 0.0f )
-		{
-			iCurSequence = Sequence::StandingUp;
-		}
-		else if( vel.y > 0.0f )
-		{
-			iCurSequence = Sequence::StandingDown;
-		}
-	}
-	vel = dir * speed;
-}
-
-void Character::Update( float dt )
+void Character::Update(float dt)
 {
 	pos += vel * dt;
-	animations[(int)iCurSequence].Update( dt );
+	animations[(int)iCurSequence].Update(dt);
 	// update effect time if active
-	if( effectActive )
+	if (effectActive)
 	{
 		effectTime += dt;
 		// deactivate effect if duration exceeded
-		if( effectTime >= effectDuration )
+		if (effectTime >= effectDuration)
 		{
 			effectActive = false;
 		}
@@ -88,4 +50,64 @@ void Character::ActivateEffect()
 {
 	effectActive = true;
 	effectTime = 0.0f;
+}
+
+void Character::SetDirection(const Vec2& dir)
+{
+	if (dir.x > 0.0f)
+	{
+		iCurSequence = Sequence::WalkingRight;
+	}
+	else if (dir.x < 0.0f)
+	{
+		iCurSequence = Sequence::WalkingLeft;
+	}
+	else if (dir.y < 0.0f)
+	{
+		iCurSequence = Sequence::WalkingUp;
+	}
+	else if (dir.y > 0.0f)
+	{
+		iCurSequence = Sequence::WalkingDown;
+	}
+	else
+	{
+		if (vel.x > 0.0f)
+		{
+			iCurSequence = Sequence::StandingRight;
+		}
+		else if (vel.x < 0.0f)
+		{
+			iCurSequence = Sequence::StandingLeft;
+		}
+		else if (vel.y < 0.0f)
+		{
+			iCurSequence = Sequence::StandingUp;
+		}
+		else if (vel.y > 0.0f)
+		{
+			iCurSequence = Sequence::StandingDown;
+		}
+	}
+	vel = dir * speed;
+}
+
+void Character::SetPos(const Vec2& pos_in)
+{
+	pos = pos_in;
+}
+
+Vec2 Character::GetPos() const
+{
+	return pos;
+}
+
+int Character::GetWidth() const
+{
+	return width;
+}
+
+int Character::GetHeight() const
+{
+	return height;
 }

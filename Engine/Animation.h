@@ -9,7 +9,7 @@ class Animation
 {
 public:
 	Animation() = default;
-	Animation(int x, int y, int width, int height, int count, const Surface* sprite, float holdTime, Color chroma = Colors::Magenta);
+	Animation(int x, int y, int width, int height, int count, const Surface* sprite, float holdTime, bool animationPingPong = false, Color chroma = Colors::Magenta);
 	template<typename E>
 	void Draw(const Vei2& pos, Graphics& gfx, E effect) const
 	{

@@ -61,6 +61,10 @@ public:
 	{
 		return this->x == rhs.x && this->y == rhs.y;
 	}
+	bool operator!=(const Vec2_& rhs) const
+	{
+		return !(*this == rhs);
+	}
 	T GetLength() const
 	{
 		return (T)std::sqrt( GetLengthSq() );

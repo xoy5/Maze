@@ -1,4 +1,5 @@
 #pragma once
+#include <string.h>
 
 #include "Animation.h"
 #include "Vec2.h"
@@ -16,17 +17,29 @@ private:
 		StandingRight,
 		StandingUp,
 		StandingDown,
-		Count
+		Count,
+		NoMove
 	};
+
 public:
-	Character( const Vec2& pos );
+	Character(const std::string& spriteFilePath, const Vec2& pos, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
 	void Draw( Graphics& gfx ) const;
-	void SetDirection( const Vec2& dir );
 	void Update( float dt );
+
 	// activates a damage visual effect
 	void ActivateEffect();
+
+public:
+	void SetDirection( const Vec2& dir );
+	void SetPos(const Vec2& pos_in);
+	Vec2 GetPos() const;
+	int GetWidth() const;
+	int GetHeight() const;
+
 private:
 	Surface sprite;
+	int width;
+	int height;
 	Vec2 pos;
 	Vec2 vel = { 0.0f,0.0f };
 	std::vector<Animation> animations;
