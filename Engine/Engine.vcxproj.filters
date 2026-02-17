@@ -139,10 +139,10 @@
       <Filter>Header Files\Engine\Graphics\2D</Filter>
     </ClInclude>
     <ClInclude Include="PlayerMouse.h">
-      <Filter>Header Files\Engine</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Maze.h">
-      <Filter>Header Files\Engine</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

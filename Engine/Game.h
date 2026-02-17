@@ -84,5 +84,6 @@ private:
 	/*  User Variables  */
 	Maze maze;
 	PlayerMouse playerMouse;
+
 	/********************************/
 };

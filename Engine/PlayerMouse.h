@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <utility>
 
 #include "Graphics.h"
 #include "Vec2.h"
@@ -25,107 +26,98 @@ public:
 		:
 		Character(spriteFilePath, pos, width, height, nFrames, frameHoldTime, animationPingPong),
 		tilePos(tilePos)
-	{
-	}
+	{}
 	void Draw(Graphics& gfx) const
 	{
 		Character::Draw(gfx);
 	}
 	void Update(float dt, const Maze& maze)
 	{
-		RectF playerRect = RectF(Character::GetPos(), float(Character::GetWidth()), float(Character::GetHeight()));
-		RectF nextMazeTileRectExpanded = maze.GetTileRectAt(GetNextTilePos()).GetExpanded(5.00f);
+		if (curMove == Move::No) return;
+		// TO DO
+	}
+	void SetDir(const Vec2& dir, const Maze& maze)
+	{
+		Move inputMove = GetMoveFromVec(dir);
+		if (inputMove == Move::No) return;
 
-		if (playerRect.IsContainedBy(nextMazeTileRectExpanded))
+		if (curMove == Move::No)
 		{
-			tilePos = GetNextTilePos();
-			Character::SetPos(maze.GetTilePosAt(tilePos));
-			curMove = nextMove;
-			nextMove = Move::No;
+			if (maze.CanEnter(GetTilePosFromMove(tilePos, inputMove)))
+			{
+				curMove = inputMove;
+				Character::SetDirection(GetVecFromMove(curMove));
+			}
 		}
 		else
 		{
- 			Character::Update(dt);
+			nextMove = inputMove; 
 		}
-	}
 
-public:
-	void SetDir(const Vec2& dir, const Maze& maze)
+	}
+	void SetStandingDir(const Maze& maze)
 	{
-		Move move = Move::No;
-		if (dir != Vec2{ 0.0f, 0.0f })
-		{
-			const auto playerTilePos = IsMoving() ? GetNextTilePos() : GetTilePos();
-			if (dir.x != 0.0f && maze.CanEnter({ playerTilePos.first + int(dir.x), playerTilePos.second }))
-			{
-				if (dir.x < 0.0f) move = Move::Left;
-				else if (dir.x > 0.0f) move = Move::Right;
-			}
-			else if (dir.y != 0.0f && maze.CanEnter({ playerTilePos.first, playerTilePos.second + int(dir.y) }))
-			{
-				if (dir.y < 0.0f) move = Move::Up;
-				else if (dir.y > 0.0f) move = Move::Down;
-			}
-		}
-
-		if (IsMoving())	
-			nextMove = move;
-		else			
-			curMove = move;
-
-		// Setting cur dir
-		Vec2 curDir = { 0.0f, 0.0f };
-
-		switch (curMove)
-		{
-		case Move::Left:
-			curDir = { -1.0f, 0.0f };
-			break;
-		case Move::Right:
-			curDir = { 1.0f, 0.0f };
-			break;
-		case Move::Up:
-			curDir = { 0.0f, -1.0f };
-			break;
-		case Move::Down:
-			curDir = { 0.0f, 1.0f };
-			break;
-		}
-
-		Character::SetDirection(curDir);
+		auto tilePos = maze.GetEntranceTilePos();
+		if (tilePos.first == 0) Character::SetStandingDirection(GetVecFromMove(Move::Right));
+		else if (tilePos.first == maze.GetNumberOfTilesX() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Right));
+		else if (tilePos.second == maze.GetNumberOfTilesY() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Up));
+		else if (tilePos.second == 0) Character::SetStandingDirection(GetVecFromMove(Move::Down));
 	}
-	std::pair<int, int> GetTilePos() const
-	{
-		return tilePos;
-	}
-	std::pair<int, int> GetNextTilePos() const
-	{
-		int x = 0;
-		int y = 0;
 
-		switch (curMove)
-		{
-		case Move::Left:
-			x--;
-			break;
-		case Move::Right:
-			x++;
-			break;
-		case Move::Up:
-			y--;
-			break;
-		case Move::Down:
-			y++;
-			break;
-		case Move::No:
-			return { -1, -1 };
-		}
-
-		return { tilePos.first + x, tilePos.second + y };
-	}
+private:
 	bool IsMoving() const
 	{
 		return curMove != Move::No;
+	}
+	bool IsOpposite(Move a, Move b) const
+	{
+		if (a == Move::Left && b == Move::Right) return true;
+		if (a == Move::Right && b == Move::Left) return true;
+		if (a == Move::Up && b == Move::Down) return true;
+		if (a == Move::Down && b == Move::Up) return true;
+		return false;
+	}
+	std::pair<int, int> GetNextTilePos() const
+	{
+		return GetTilePosFromMove(tilePos, curMove);
+	}
+	std::pair<int, int> GetTilePosFromMove(std::pair<int, int> base, Move m) const
+	{
+		switch (m)
+		{
+		case Move::Left:  return { base.first - 1, base.second };
+		case Move::Right: return { base.first + 1, base.second };
+		case Move::Up:    return { base.first, base.second - 1 };
+		case Move::Down:  return { base.first, base.second + 1 };
+		default:          return base;
+		}
+	}
+	Vec2 GetVecFromMove(Move m) const
+	{
+		switch (m)
+		{
+		case Move::Left:  return { -1.0f,  0.0f };
+		case Move::Right: return { 1.0f,  0.0f };
+		case Move::Up:    return { 0.0f, -1.0f };
+		case Move::Down:  return { 0.0f,  1.0f };
+		default:          return { 0.0f,  0.0f };
+		}
+	}
+	Move GetMoveFromVec(Vec2 v) const
+	{
+		if (v.x < 0.0f) return Move::Left;
+		else if (v.x > 0.0f) return Move::Right;
+		else if (v.y < 0.0f) return Move::Up;
+		else if (v.y > 0.0f) return Move::Down;
+		return Move::No;
+	}
+	void SnapToGrid(const Maze& maze)
+	{
+		Character::SetPos(maze.GetPosOfTileAt(tilePos));
+	}
+	bool IsInTile(const Maze& maze, std::pair<int, int> tilePos)
+	{
+		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(5.0f));
 	}
 
 private:

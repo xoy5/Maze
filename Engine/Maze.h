@@ -9,9 +9,13 @@
 
 class Maze
 {
-public:
+private:
+	// Tile definitions using bitwise flags.
+	// NOTE: Each tile should be assigned exactly ONE type.
+	// Logic uses bitwise values to simplify collision checking
 	enum class Tile
 	{
+		Undefined = 0,
 		Floor = 1,
 		Entrance = 2,
 		Exit = 4,
@@ -28,7 +32,7 @@ public:
 		}
 
 		std::ifstream file("Files/Data/maze.txt");
-		assert(file, "File Error");
+		assert(file && "File Error");
 
 		char c;
 		int i = 0;
@@ -91,31 +95,50 @@ public:
 	{
 		for (int i = 0; i < nTilesX * nTilesY; i++)
 		{
-			if (tiles[i] == Tile::Entrance)
+			if (int(tiles[i]) & int(Tile::Entrance))
 				return { i % nTilesX, i / nTilesX };
 		}
 
-		assert(false, "There is no entrance.");
+		assert(false && "There is no entrance.");
 	}
 	Vec2 GetEntrancePos() const
 	{
-		return GetTilePosAt(GetEntranceTilePos());
-	}
-	Tile GetTileAt(std::pair<int, int> tilePos) const
-	{
-		return tiles[tilePos.first + tilePos.second * nTilesX];
+		return GetPosOfTileAt(GetEntranceTilePos());
 	}
 	bool CanEnter(std::pair<int, int> tilePos) const
 	{
 		return bool(int(GetTileAt(tilePos)) & 15); // 15 means that I choose Floor, Entrance, Exit and Cheese
 	}
-	RectF GetTileRectAt(std::pair<int, int> tilePos) const
+	RectF GetRectOfTileAt(std::pair<int, int> tilePos) const
 	{
 		return RectF(Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) }, float(tileSize), float(tileSize));
 	}
-	Vec2 GetTilePosAt(std::pair<int, int> tilePos) const
+	Vec2 GetPosOfTileAt(std::pair<int, int> tilePos) const
 	{
 		return Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) };
+	}
+	int GetNumberOfTilesX() const
+	{
+		return nTilesX;
+	};
+	int GetNumberOfTilesY() const
+	{
+		return nTilesY;
+	};
+	int GetTileSize() const
+	{
+		return tileSize;
+	}
+private:
+	Tile GetTileAt(std::pair<int, int> tilePos) const
+	{
+		if (!(tilePos.first >= 0 && tilePos.first < nTilesX &&
+			tilePos.second >= 0 && tilePos.second < nTilesY))
+		{
+			return Tile::Undefined;
+		}
+
+		return tiles[tilePos.first + tilePos.second * nTilesX];
 	}
 
 private:
