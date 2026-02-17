@@ -92,6 +92,26 @@ void Character::SetDirection(const Vec2& dir)
 	vel = dir * speed;
 }
 
+void Character::SetStandingDirection(const Vec2& dir)
+{
+	if (dir.x > 0.0f)
+	{
+		iCurSequence = Sequence::StandingRight;
+	}
+	else if (dir.x < 0.0f)
+	{
+		iCurSequence = Sequence::StandingLeft;
+	}
+	else if (dir.y < 0.0f)
+	{
+		iCurSequence = Sequence::StandingUp;
+	}
+	else if (dir.y > 0.0f)
+	{
+		iCurSequence = Sequence::StandingDown;
+	}
+}
+
 void Character::SetPos(const Vec2& pos_in)
 {
 	pos = pos_in;
@@ -110,4 +130,9 @@ int Character::GetWidth() const
 int Character::GetHeight() const
 {
 	return height;
+}
+
+RectF Character::GetRect() const
+{
+	return RectF{ pos, float(width), float(height) };
 }

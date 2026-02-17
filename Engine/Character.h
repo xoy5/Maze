@@ -30,10 +30,12 @@ public:
 
 public:
 	void SetDirection( const Vec2& dir );
+	void SetStandingDirection(const Vec2& dir);
 	void SetPos(const Vec2& pos_in);
 	Vec2 GetPos() const;
 	int GetWidth() const;
 	int GetHeight() const;
+	RectF GetRect() const;
 
 private:
 	Surface sprite;
