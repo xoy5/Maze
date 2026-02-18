@@ -66,30 +66,39 @@ public:
 	{
 		for (int i = 0; i < nTilesX * nTilesY; i++)
 		{
+			const int x = i % nTilesX;
+			const int y = i / nTilesX;
+			const Vec2 posOfTile = GetPosOfTileAt({ x,y });
+
 			switch (tiles[i])
 			{
 			case Tile::Wall:
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteWall, SpriteEffect::Copy{});
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteWall, SpriteEffect::Copy{});
 				break;
 			case Tile::Cheese:
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Copy{});
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteCheese, SpriteEffect::Chroma{ Colors::Magenta });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Copy{});
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteCheese, SpriteEffect::Chroma{ Colors::Magenta });
 				break;
 			case Tile::Floor:
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Copy{});
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Copy{});
 				break;
 			case Tile::Entrance:
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Green });
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Green });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
 				break;
 			case Tile::Exit:
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Red });
-				gfx.DrawSprite((i % nTilesX) * tileSize, (i / nTilesX) * tileSize, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Red });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
 				break;
 			}
 		}
 	}
-
+	void DrawTileHighlightAt(Graphics& gfx, std::pair<int, int>tilePos, const Color& c) const
+	{
+		const Vec2 posOfTile = GetPosOfTileAt(tilePos);
+		gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, c });
+		gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+	}
 public:
 	std::pair<int, int> GetEntranceTilePos() const
 	{

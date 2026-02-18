@@ -34,12 +34,24 @@ public:
 	void Update(float dt, const Maze& maze)
 	{
 		if (curMove == Move::No) return;
-		// TO DO
+		
+		Character::Update(dt);
+		if (IsInTile(maze, GetNextTilePos()))
+		{
+			tilePos = GetNextTilePos();
+			SnapToGrid(maze);
+			curMove = nextMove;
+			nextMove = Move::No;
+		}
 	}
 	void SetDir(const Vec2& dir, const Maze& maze)
 	{
 		Move inputMove = GetMoveFromVec(dir);
-		if (inputMove == Move::No) return;
+		if (inputMove == Move::No)
+		{
+			nextMove = Move::No;
+			return;
+		}
 
 		if (curMove == Move::No)
 		{
@@ -63,6 +75,15 @@ public:
 		else if (tilePos.second == maze.GetNumberOfTilesY() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Up));
 		else if (tilePos.second == 0) Character::SetStandingDirection(GetVecFromMove(Move::Down));
 	}
+public:
+	std::pair<int, int> GetTilePos() const
+	{
+		return tilePos;
+	}
+	std::pair<int, int> GetNextTilePos() const
+	{
+		return GetTilePosFromMove(tilePos, curMove);
+	}
 
 private:
 	bool IsMoving() const
@@ -76,10 +97,6 @@ private:
 		if (a == Move::Up && b == Move::Down) return true;
 		if (a == Move::Down && b == Move::Up) return true;
 		return false;
-	}
-	std::pair<int, int> GetNextTilePos() const
-	{
-		return GetTilePosFromMove(tilePos, curMove);
 	}
 	std::pair<int, int> GetTilePosFromMove(std::pair<int, int> base, Move m) const
 	{
@@ -117,7 +134,7 @@ private:
 	}
 	bool IsInTile(const Maze& maze, std::pair<int, int> tilePos)
 	{
-		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(5.0f));
+		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(10.0f));
 	}
 
 private:

@@ -102,7 +102,10 @@ void Game::UpdateModel(float dt)
 void Game::ComposeFrame()
 {
 	maze.Draw(gfx);
+	maze.DrawTileHighlightAt(gfx, playerMouse.GetTilePos(), Colors::Aqua);
+	maze.DrawTileHighlightAt(gfx, playerMouse.GetNextTilePos(), Colors::PeachPuff);
 	playerMouse.Draw(gfx);
+
 
 	// Draw FPS
 	const std::string fpsText = "FPS: " + std::to_string(FPS);
