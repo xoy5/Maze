@@ -34,7 +34,7 @@ void Character::Draw(Graphics& gfx) const
 
 void Character::Update(float dt)
 {
-	pos += vel * dt;
+	pos += dir * speed * dt;
 	animations[(int)iCurSequence].Update(dt);
 	// update effect time if active
 	if (effectActive)
@@ -54,8 +54,9 @@ void Character::ActivateEffect()
 	effectTime = 0.0f;
 }
 
-void Character::SetDirection(const Vec2& dir)
+void Character::SetDirection(const Vec2& dir_in)
 {
+	dir = dir_in;
 	if (dir.x > 0.0f)
 	{
 		iCurSequence = Sequence::WalkingRight;
@@ -91,7 +92,6 @@ void Character::SetDirection(const Vec2& dir)
 			iCurSequence = Sequence::StandingDown;
 		}
 	}
-	vel = dir * speed;
 }
 
 void Character::SetStandingDirection(const Vec2& dir)

@@ -21,15 +21,15 @@ private:
 	};
 
 public:
-	Character(const std::string& spriteFilePath, const Vec2& pos,float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
-	void Draw( Graphics& gfx ) const;
-	void Update( float dt );
+	Character(const std::string& spriteFilePath, const Vec2& pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
+	void Draw(Graphics& gfx) const;
+	void Update(float dt);
 
 	// activates a damage visual effect
 	void ActivateEffect();
 
 public:
-	void SetDirection( const Vec2& dir );
+	void SetDirection(const Vec2& dir);
 	void SetStandingDirection(const Vec2& dir);
 	void SetPos(const Vec2& pos_in);
 	Vec2 GetPos() const;
@@ -45,7 +45,8 @@ private:
 	int width;
 	int height;
 	Vec2 pos;
-	Vec2 vel = { 0.0f,0.0f };
+	Vec2 vel = { 0.0f, 0.0f };
+	Vec2 dir = { 0.0f, 0.0f };
 	std::vector<Animation> animations;
 	Sequence iCurSequence = Sequence::StandingDown;
 	float speed;

@@ -10,17 +10,8 @@
 class MyMessageBox
 {
 public:
-	enum class Buttons
-	{
-		YesNo,
-		Ok
-	};
-	enum class ValueButton
-	{
-		Yes,
-		No,
-		Ok
-	};
+	enum class Buttons { YesNo, Ok };
+	enum class ValueButton { Yes, No, Ok, None };
 
 public:
 	MyMessageBox(const Font* font)
@@ -34,10 +25,8 @@ public:
 		buttonNo.SetPositionCenter(true);
 		buttonOk.SetPositionCenter(true);
 		buttonNo.SetSizeWidthContentBox(font->GetWidthChar() * 3);
-		int paddingBetween = 20;
-		buttonNo.SetPos(buttonNo.GetPos() - Vei2{ buttonNo.GetRect().GetWidth() / 2 + paddingBetween / 2, 0 });
-		buttonYes.SetPos(buttonYes.GetPos() + Vei2{ buttonYes.GetRect().GetWidth() / 2 + paddingBetween / 2,0 });
-
+		buttonOk.SetSizeWidthContentBox(font->GetWidthChar() * 3);
+		UpdateLayout();
 	}
 	void Draw(Graphics& gfx) const
 	{
@@ -50,7 +39,7 @@ public:
 		// Text
 		Vei2 posText;
 		if (font->NumberOfLines(messageText) == 1) {
-			posText = Vei2{ Graphics::GetScreenCenter().x, rect.top + rect.GetHeight() / 4 } - Vei2{int(messageText.size()) * font->GetWidthChar() / 2, 0};
+			posText = Vei2{ Graphics::GetScreenCenter().x, rect.top + rect.GetHeight() / 4 } - Vei2{ int(messageText.size()) * font->GetWidthChar() / 2, 0 };
 		}
 		else {
 			posText = Vei2{ Graphics::GetScreenCenter().x, rect.top + rect.GetHeight() / 5 } - Vei2{ font->GetLongestLineSize(messageText) * font->GetWidthChar() / 2, 0 };
@@ -69,40 +58,57 @@ public:
 			break;
 		}
 	}
-	bool ProcessMouse(const Mouse::Event& e, ValueButton* button)
+	ValueButton ProcessMouse(const Mouse::Event& e)
 	{
-		bool clicked = false;
-		if (buttons == Buttons::YesNo) {
+		switch (buttons)
+		{
+		case Buttons::YesNo:
 			buttonYes.ProcessMouse(e);
 			buttonNo.ProcessMouse(e);
+			if (buttonYes.IsClicked()) return ValueButton::Yes;
+			else if (buttonNo.IsClicked()) return ValueButton::No;
+			break;
 
-			if (buttonYes.IsClicked()) {
-				*button = ValueButton::Yes;
-				clicked = true;
-			}
-			else if (buttonNo.IsClicked()) {
-				*button = ValueButton::No;
-				clicked = true;
-			}
-		}
-		else {
+		case Buttons::Ok:
 			buttonOk.ProcessMouse(e);
-			if (buttonOk.IsClicked()) {
-				*button = ValueButton::Ok;
-				clicked = true;
-			}
+			if (buttonOk.IsClicked()) return ValueButton::Ok;
+			break;
 		}
 
-		return clicked;
+		return ValueButton::None;
 	}
 	void SetButtons(Buttons buttons)
 	{
 		this->buttons = buttons;
+		UpdateLayout();
 	}
 	void SetText(const std::string& text)
 	{
 		messageText = text;
 	}
+
+private:
+	void UpdateLayout()
+	{
+		Vei2 buttonAreaCenter = { rect.GetCenter().x, rect.top + (rect.GetHeight() * 3 / 4) };
+		int padding = 20;
+
+		if (buttons == Buttons::YesNo)
+		{
+			int totalWidth = buttonYes.GetRect().GetWidth() + padding + buttonNo.GetRect().GetWidth();
+
+			Vei2 posNo = buttonAreaCenter - Vei2{ totalWidth / 2 - buttonNo.GetRect().GetWidth() / 2, 0 };
+			buttonNo.SetPos(posNo);
+
+			Vei2 posYes = buttonAreaCenter + Vei2{ totalWidth / 2 - buttonYes.GetRect().GetWidth() / 2, 0 };
+			buttonYes.SetPos(posYes);
+		}
+		else
+		{
+			buttonOk.SetPos(buttonAreaCenter);
+		}
+	}
+
 private:
 	static constexpr RectI rect = RectI{ Graphics::ScreenWidth / 5, Graphics::ScreenWidth / 5 * 4 , Graphics::ScreenHeight / 5, Graphics::ScreenHeight / 5 * 4 };
 	const Font* font;
