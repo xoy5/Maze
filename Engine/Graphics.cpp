@@ -436,6 +436,21 @@ void Graphics::DrawRect(int x0, int y0, int x1, int y1, Color c)
 	}
 }
 
+void Graphics::DrawTransparentRect(int x0, int y0, int x1, int y1, Color c)
+{
+	x0 = std::max(0, x0);
+	y0 = std::max(0, y0);
+	x1 = std::min(Graphics::ScreenWidth, x1);
+	y1 = std::min(Graphics::ScreenHeight, y1);
+	for (int y = y0; y < y1; ++y)
+	{
+		for (int x = x0; x < x1; ++x)
+		{
+			PutPixel(x, y, Color::Blend(c, GetPixel(x, y)));
+		}
+	}
+}
+
 void Graphics::DrawDisabled(const RectI& rect)
 {
 	Color src = Colors::Black;

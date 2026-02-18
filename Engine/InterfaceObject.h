@@ -69,7 +69,7 @@ public:
 
 		// background
 		if (isSetBackground && isSetBackgroundHoverDarker && hovered) {
-			gfx.DrawRect(GetRect().GetExpanded(-borderSize), Color::GetDarker(backgroundColor, darker));
+			gfx.DrawRect(GetRect().GetExpanded(-borderSize), Color::Darken(backgroundColor, darker));
 		}
 		else if (isSetBackground) {
 			gfx.DrawRect(GetRect().GetExpanded(-borderSize), backgroundColor);

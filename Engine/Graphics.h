@@ -56,12 +56,14 @@ public:
 	Graphics& operator=( const Graphics& ) = delete;
 	void EndFrame();
 	void BeginFrame();
+
 	Color GetPixel( int x,int y ) const;
 	void PutPixel( int x,int y,int r,int g,int b )
 	{
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y, Color c );
+
 	void PutPixelIfInRect(int x, int y, Color c, RectI rect = RectI({ 0,0 }, Graphics::ScreenWidth, Graphics::ScreenHeight));
 
 	void DrawLine(const Vei2& p, const Vei2& q, int thickness = 1, const Color& c = Colors::White);
@@ -82,15 +84,19 @@ public:
 		DrawCircleOutline(Vei2{ center }, radius, thickness, segments);
 	}
 
-	void DrawRect(int x0, int y0, int x1, int y1, Color c);
-	void DrawRect(const RectI& rect, Color c)
-	{
-		DrawRect(rect.left, rect.top, rect.right, rect.bottom, c);
-	}
-	void DrawRect(const RectF& rect, Color c)
+	template<typename E>
+	void DrawRect(const Rect_<E>& rect, Color c)
 	{
 		DrawRect((int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom, c);
 	}
+	void DrawRect(int x0, int y0, int x1, int y1, Color c);
+
+	template<typename E>
+	void DrawTransparentRect(const Rect_<E>& rect, Color c)
+	{
+		DrawTransparentRect((int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom, c);
+	}
+	void DrawTransparentRect(int x0, int y0, int x1, int y1, Color c);
 
 	void DrawDisabled(const RectI& rect);
 

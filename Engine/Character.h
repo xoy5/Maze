@@ -36,6 +36,9 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 	RectF GetRect() const;
+	float GetSpeed() const;
+	void SetSpeed(float speed_in);
+	float GetDefaultSpeed() const;
 
 private:
 	Surface sprite;
@@ -46,6 +49,7 @@ private:
 	std::vector<Animation> animations;
 	Sequence iCurSequence = Sequence::StandingDown;
 	float speed;
+	const float defaultSpeed;
 	static constexpr float effectDuration = 0.045f;
 	float effectTime = 0.0f;
 	bool effectActive = false;

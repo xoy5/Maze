@@ -20,6 +20,8 @@
 ******************************************************************************************/
 #pragma once
 #include <fstream>
+#include <algorithm>
+
 class Color
 {
 public:
@@ -29,23 +31,28 @@ public:
 	constexpr Color(const Color& col)
 		:
 		dword(col.dword)
-	{}
+	{
+	}
 	constexpr Color(unsigned int dw)
 		:
 		dword(dw)
-	{}
+	{
+	}
 	constexpr Color(unsigned char x, unsigned char r, unsigned char g, unsigned char b)
 		:
 		dword((x << 24u) | (r << 16u) | (g << 8u) | b)
-	{}
+	{
+	}
 	constexpr Color(unsigned char r, unsigned char g, unsigned char b)
 		:
 		dword((r << 16u) | (g << 8u) | b)
-	{}
+	{
+	}
 	constexpr Color(Color col, unsigned char x)
 		:
 		Color((x << 24u) | col.dword)
-	{}
+	{
+	}
 	Color& operator =(Color color)
 	{
 		dword = color.dword;
@@ -99,9 +106,24 @@ public:
 	{
 		dword = (dword & 0xFFFFFF00u) | b;
 	}
-	static Color GetDarker(const Color& c, const int& darker)
+	static Color Darken(const Color& c, const int& amount)
 	{
-		return Color(unsigned int(std::max((int)c.GetR() - darker, 0)), unsigned int(std::max((int)c.GetG() - darker, 0)), unsigned int(std::max((int)c.GetB() - darker, 0)));
+		return Color(
+			unsigned int(std::clamp((int)c.GetR() - amount, 0, 255)),
+			unsigned int(std::clamp((int)c.GetG() - amount, 0, 255)),
+			unsigned int(std::clamp((int)c.GetB() - amount, 0, 255))
+		);
+	}
+	static Color Blend(const Color& c1, const Color& c2, float ratio = 0.5f)
+	{
+		const float r1 = std::clamp(1.0f - ratio, 0.0f, 1.0f);
+		const float r2 = std::clamp(ratio, 0.0f, 1.0f);
+		
+		return Color(
+				int(c1.GetR() * r1 + c2.GetR() * r2),
+				int(c1.GetG() * r1 + c2.GetG() * r2),
+				int(c1.GetB() * r1 + c2.GetB() * r2)
+			); 
 	}
 };
 

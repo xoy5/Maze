@@ -61,12 +61,7 @@ namespace SpriteEffect
 			if( src != chroma )
 			{
 				const Color dest = gfx.GetPixel( xDest,yDest );
-				const Color blend = {
-					unsigned char( (src.GetR() + dest.GetR()) / 2 ),
-					unsigned char( (src.GetG() + dest.GetG()) / 2 ),
-					unsigned char( (src.GetB() + dest.GetB()) / 2 )
-				};
-				gfx.PutPixel( xDest,yDest,blend );
+				gfx.PutPixel( xDest,yDest, Color::Blend(src, dest));
 			}
 		}
 	private:

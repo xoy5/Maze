@@ -5,6 +5,7 @@ Character::Character(const std::string& spriteFilePath, const Vec2& pos, float s
 	sprite(spriteFilePath),
 	pos(pos),
 	speed(speed),
+	defaultSpeed(speed),
 	width(width),
 	height(height)
 {
@@ -136,4 +137,19 @@ int Character::GetHeight() const
 RectF Character::GetRect() const
 {
 	return RectF{ pos, float(width), float(height) };
+}
+
+float Character::GetSpeed() const
+{
+	return speed;
+}
+
+void Character::SetSpeed(float speed_in)
+{
+	speed = speed_in;
+}
+
+float Character::GetDefaultSpeed() const
+{
+	return defaultSpeed;
 }
