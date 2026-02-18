@@ -22,9 +22,9 @@ private:
 	};
 
 public:
-	PlayerMouse(const std::string& spriteFilePath, Vec2 pos, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong, std::pair<int, int> tilePos)
+	PlayerMouse(const std::string& spriteFilePath, Vec2 pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong, std::pair<int, int> tilePos)
 		:
-		Character(spriteFilePath, pos, width, height, nFrames, frameHoldTime, animationPingPong),
+		Character(spriteFilePath, pos, speed, width, height, nFrames, frameHoldTime, animationPingPong),
 		tilePos(tilePos)
 	{}
 	void Draw(Graphics& gfx) const
@@ -36,22 +36,32 @@ public:
 		if (curMove == Move::No) return;
 		
 		Character::Update(dt);
+
 		if (IsInTile(maze, GetNextTilePos()))
 		{
 			tilePos = GetNextTilePos();
 			SnapToGrid(maze);
-			curMove = nextMove;
-			nextMove = Move::No;
+
+			// if can turn
+			if (nextMove != Move::No && maze.CanEnter(GetTilePosFromMove(tilePos, nextMove)))
+			{
+				curMove = nextMove;
+				nextMove = Move::No;
+			}
+			// if cannot go forward stop
+			else if (!maze.CanEnter(GetTilePosFromMove(tilePos, curMove)))
+			{
+				curMove = Move::No;
+			}
+			Character::SetDirection(GetVecFromMove(curMove));
 		}
 	}
 	void SetDir(const Vec2& dir, const Maze& maze)
 	{
 		Move inputMove = GetMoveFromVec(dir);
-		if (inputMove == Move::No)
-		{
-			nextMove = Move::No;
-			return;
-		}
+		if (inputMove == Move::No) return;
+
+		// TO DO 180 degree rotation
 
 		if (curMove == Move::No)
 		{
@@ -63,7 +73,7 @@ public:
 		}
 		else
 		{
-			nextMove = inputMove; 
+			nextMove = inputMove; // gonna check in update if can move
 		}
 
 	}
@@ -75,6 +85,7 @@ public:
 		else if (tilePos.second == maze.GetNumberOfTilesY() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Up));
 		else if (tilePos.second == 0) Character::SetStandingDirection(GetVecFromMove(Move::Down));
 	}
+
 public:
 	std::pair<int, int> GetTilePos() const
 	{
@@ -122,8 +133,8 @@ private:
 	}
 	Move GetMoveFromVec(Vec2 v) const
 	{
-		if (v.x < 0.0f) return Move::Left;
-		else if (v.x > 0.0f) return Move::Right;
+		if (v.x < 0.0f && !(curMove == Move::Left && v.y != 0.0f /*Leetcode Kira 210IQ*/)) return Move::Left;
+		else if (v.x > 0.0f && !(curMove == Move::Right && v.y != 0.0f)) return Move::Right;
 		else if (v.y < 0.0f) return Move::Up;
 		else if (v.y > 0.0f) return Move::Down;
 		return Move::No;
@@ -134,7 +145,7 @@ private:
 	}
 	bool IsInTile(const Maze& maze, std::pair<int, int> tilePos)
 	{
-		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(10.0f));
+		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(5.0f));
 	}
 
 private:

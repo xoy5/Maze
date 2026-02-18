@@ -21,7 +21,7 @@ private:
 	};
 
 public:
-	Character(const std::string& spriteFilePath, const Vec2& pos, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
+	Character(const std::string& spriteFilePath, const Vec2& pos,float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
 	void Draw( Graphics& gfx ) const;
 	void Update( float dt );
 
@@ -45,7 +45,7 @@ private:
 	Vec2 vel = { 0.0f,0.0f };
 	std::vector<Animation> animations;
 	Sequence iCurSequence = Sequence::StandingDown;
-	float speed = 110.0f;
+	float speed;
 	static constexpr float effectDuration = 0.045f;
 	float effectTime = 0.0f;
 	bool effectActive = false;

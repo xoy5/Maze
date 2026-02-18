@@ -1,9 +1,10 @@
 #include "Character.h"
 
-Character::Character(const std::string& spriteFilePath, const Vec2& pos, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
+Character::Character(const std::string& spriteFilePath, const Vec2& pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
 	:
 	sprite(spriteFilePath),
 	pos(pos),
+	speed(speed),
 	width(width),
 	height(height)
 {

@@ -27,7 +27,7 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	playerMouse("Files/Images/Sprites/mouse.bmp", maze.GetEntrancePos(), 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
+	playerMouse("Files/Images/Sprites/mouse.bmp", maze.GetEntrancePos(), 70.0f, 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
 {
 	playerMouse.SetStandingDir(maze);
 }
