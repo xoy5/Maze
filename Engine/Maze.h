@@ -83,12 +83,12 @@ public:
 				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Copy{});
 				break;
 			case Tile::Entrance:
-				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Green });
-				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Copy{});
+				gfx.DrawTransparentRect(GetRectOfTileAt({ x,y }), Colors::Green);
 				break;
 			case Tile::Exit:
-				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, Colors::Red });
-				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+				gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Copy{});
+				gfx.DrawTransparentRect(GetRectOfTileAt({ x,y }), Colors::Red);
 				break;
 			}
 		}
@@ -96,10 +96,23 @@ public:
 	void DrawTileHighlightAt(Graphics& gfx, std::pair<int, int>tilePos, const Color& c) const
 	{
 		const Vec2 posOfTile = GetPosOfTileAt(tilePos);
-		gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Substitution{ Colors::Magenta, c });
-		gfx.DrawSprite(posOfTile.x, posOfTile.y, spriteFloor, SpriteEffect::Ghost{ Colors::Magenta });
+		gfx.DrawTransparentRect(RectF{ posOfTile, float(tileSize), float(tileSize) }, c);
 	}
+	bool CheckAndCollectCheese(std::pair<int, int> playerTilePos)
+	{
+		if (int(GetTileAt(playerTilePos)) & int(Tile::Cheese))
+		{
+			SetTileAt(playerTilePos, Tile::Floor);
+			return true;
+		}
+		return false;
+	}
+
 public:
+	bool CanEnter(std::pair<int, int> tilePos) const
+	{
+		return bool(int(GetTileAt(tilePos)) & 15); // 15 means that I choose Floor, Entrance, Exit and Cheese
+	}
 	std::pair<int, int> GetEntranceTilePos() const
 	{
 		for (int i = 0; i < nTilesX * nTilesY; i++)
@@ -114,18 +127,15 @@ public:
 	{
 		return GetPosOfTileAt(GetEntranceTilePos());
 	}
-	bool CanEnter(std::pair<int, int> tilePos) const
+	Vec2 GetPosOfTileAt(std::pair<int, int> tilePos) const
 	{
-		return bool(int(GetTileAt(tilePos)) & 15); // 15 means that I choose Floor, Entrance, Exit and Cheese
+		return Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) };
 	}
 	RectF GetRectOfTileAt(std::pair<int, int> tilePos) const
 	{
 		return RectF(Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) }, float(tileSize), float(tileSize));
 	}
-	Vec2 GetPosOfTileAt(std::pair<int, int> tilePos) const
-	{
-		return Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) };
-	}
+
 	int GetNumberOfTilesX() const
 	{
 		return nTilesX;
@@ -138,6 +148,7 @@ public:
 	{
 		return tileSize;
 	}
+
 private:
 	Tile GetTileAt(std::pair<int, int> tilePos) const
 	{
@@ -148,6 +159,10 @@ private:
 		}
 
 		return tiles[tilePos.first + tilePos.second * nTilesX];
+	}
+	void SetTileAt(std::pair<int, int> tilePos, Tile type)
+	{
+		tiles[tilePos.second * nTilesX + tilePos.first] = type;
 	}
 
 private:

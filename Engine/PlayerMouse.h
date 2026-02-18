@@ -35,6 +35,7 @@ public:
 	{
 		if (curMove == Move::No) return;
 		
+		Character::SetSpeed(GetCurrentSpeed());
 		Character::Update(dt);
 
 		if (IsInTile(maze, GetNextTilePos()))
@@ -42,17 +43,18 @@ public:
 			tilePos = GetNextTilePos();
 			SnapToGrid(maze);
 
-			// if can turn
+			// Check if the queued next move is valid to perform a turn
 			if (nextMove != Move::No && maze.CanEnter(GetTilePosFromMove(tilePos, nextMove)))
 			{
 				curMove = nextMove;
 				nextMove = Move::No;
 			}
-			// if cannot go forward stop
+			// If the current path is blocked, stop the movement
 			else if (!maze.CanEnter(GetTilePosFromMove(tilePos, curMove)))
 			{
 				curMove = Move::No;
 			}
+
 			Character::SetDirection(GetVecFromMove(curMove));
 		}
 	}
@@ -61,8 +63,16 @@ public:
 		Move inputMove = GetMoveFromVec(dir);
 		if (inputMove == Move::No) return;
 
-		// TO DO 180 degree rotation
+		// Handle instantaneous 180-degree turns
+		if (IsOpposite(curMove, inputMove))
+		{
+			tilePos = GetNextTilePos();
+			curMove = inputMove;
+			Character::SetDirection(GetVecFromMove(curMove));
+			return;
+		}
 
+		// Immediate move if standing still
 		if (curMove == Move::No)
 		{
 			if (maze.CanEnter(GetTilePosFromMove(tilePos, inputMove)))
@@ -71,9 +81,10 @@ public:
 				Character::SetDirection(GetVecFromMove(curMove));
 			}
 		}
+		// Queue the move to be processed at the next tile junction
 		else
 		{
-			nextMove = inputMove; // gonna check in update if can move
+			nextMove = inputMove;
 		}
 
 	}
@@ -84,6 +95,10 @@ public:
 		else if (tilePos.first == maze.GetNumberOfTilesX() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Right));
 		else if (tilePos.second == maze.GetNumberOfTilesY() - 1) Character::SetStandingDirection(GetVecFromMove(Move::Up));
 		else if (tilePos.second == 0) Character::SetStandingDirection(GetVecFromMove(Move::Down));
+	}
+	void SetSprintMode(bool active)
+	{
+		sprintMode = active;
 	}
 
 public:
@@ -145,11 +160,29 @@ private:
 	}
 	bool IsInTile(const Maze& maze, std::pair<int, int> tilePos)
 	{
-		return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(5.0f));
+		// return Character::GetRect().IsContainedBy(maze.GetRectOfTileAt(tilePos).GetExpanded(5.0f)); I am getting smarter and smarter 
+		switch (curMove)
+		{
+		case Move::Left:
+			return Character::GetRect().right <= maze.GetRectOfTileAt(GetNextTilePos()).right;
+		case Move::Right:
+			return Character::GetRect().left >= maze.GetRectOfTileAt(GetNextTilePos()).left;
+		case Move::Up:
+			return Character::GetRect().bottom <= maze.GetRectOfTileAt(GetNextTilePos()).bottom;
+		case Move::Down:
+			return Character::GetRect().top >= maze.GetRectOfTileAt(GetNextTilePos()).top;
+		case Move::No:
+			return true;
+		}
+	}
+	float GetCurrentSpeed() const
+	{
+		return Character::GetDefaultSpeed() * (sprintMode ? 5.0f : 1.0f);
 	}
 
 private:
 	Move curMove = Move::No;
 	Move nextMove = Move::No;
 	std::pair<int, int> tilePos;
+	bool sprintMode = false;
 };

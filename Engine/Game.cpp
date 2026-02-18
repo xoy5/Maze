@@ -27,7 +27,7 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	playerMouse("Files/Images/Sprites/mouse.bmp", maze.GetEntrancePos(), 70.0f, 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
+	playerMouse("Files/Images/Sprites/mouse.bmp", maze.GetEntrancePos(), 90.0f, 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
 {
 	playerMouse.SetStandingDir(maze);
 }
@@ -96,7 +96,9 @@ void Game::ProcessInput()
 
 void Game::UpdateModel(float dt)
 {
+	playerMouse.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
 	playerMouse.Update(dt, maze);
+	maze.CheckAndCollectCheese(playerMouse.GetTilePos()); // If more than one player, use 'if'
 }
 
 void Game::ComposeFrame()
