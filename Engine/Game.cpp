@@ -27,9 +27,10 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	playerMouse("Files/Images/Sprites/mouse.bmp", maze.GetEntrancePos(), 90.0f, 40, 40, 3, 0.16f, true, maze.GetEntranceTilePos())
+	playerMouse(maze, "Files/Images/Sprites/mouse.bmp", 90.0f, 40, 40, 3, 0.16f, true)
 {
-	playerMouse.SetStandingDir(maze);
+	myMessageBox.SetButtons(MyMessageBox::Buttons::Ok);
+	myMessageBox.SetText("Error");
 }
 
 void Game::Go()
@@ -58,6 +59,7 @@ void Game::Go()
 void Game::ProcessInput()
 {
 	////////////// KEYBOARD ///////////////
+	/////////////// TYPING ////////////////
 	// Keys
 	while (!wnd.kbd.KeyIsEmpty())
 	{
@@ -72,33 +74,56 @@ void Game::ProcessInput()
 	{
 		const char character = wnd.kbd.ReadChar();
 	}
-
-	// Controls
+	///////////////////////////////////////
+	/////////////// MOVEMENT //////////////
 	Vec2 dir = { 0.0f, 0.0f };
 	if (wnd.kbd.KeyIsPressed('A')) dir += {-1.0f, 0.0f};
 	if (wnd.kbd.KeyIsPressed('D')) dir += {1.0f, 0.0f};
 	if (wnd.kbd.KeyIsPressed('W')) dir += {0.0f, -1.0f};
 	if (wnd.kbd.KeyIsPressed('S')) dir += {0.0f, 1.0f};
 
-	playerMouse.SetDir(dir, maze);
+	playerMouse.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
 
+	playerMouse.SetDir(dir, maze);
 	///////////////////////////////////////
+	///////////////////////////////////////
+
+
 
 	//////////////// MOUSE ////////////////
 	while (!wnd.mouse.IsEmpty())
 	{
 		const auto e = wnd.mouse.Read();
-		// buttons
-		// editor
+		if (flag_gameEnd)
+		{
+			MyMessageBox::ValueButton value = myMessageBox.ProcessMouse(e);
+
+			switch (value)
+			{
+				case MyMessageBox::ValueButton::Ok:
+					flag_gameEnd = false;
+					maze.ResetToDefault();
+					playerMouse.ResetToDefault(maze);
+					myMessageBox.SetText("Error");
+			}
+		
+		}
 	}
 	///////////////////////////////////////
 }
 
 void Game::UpdateModel(float dt)
 {
-	playerMouse.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
-	playerMouse.Update(dt, maze);
-	maze.CheckAndCollectCheese(playerMouse.GetTilePos()); // If more than one player, use 'if'
+	if (flag_gameEnd == false)
+	{
+		playerMouse.Update(dt, maze);
+		maze.CheckAndCollectCheese(playerMouse.GetTilePos()); // If more than one player, use 'if'
+		if (maze.GetExitTilePos() == playerMouse.GetTilePos() && maze.GetNumberOfCheeses() == 0)
+		{
+			flag_gameEnd = true;
+			myMessageBox.SetText("You WIN");
+		}
+	}
 }
 
 void Game::ComposeFrame()
@@ -108,7 +133,10 @@ void Game::ComposeFrame()
 	maze.DrawTileHighlightAt(gfx, playerMouse.GetNextTilePos(), Colors::PeachPuff);
 	playerMouse.Draw(gfx);
 
-
+	if (flag_gameEnd)
+	{
+		myMessageBox.Draw(gfx);
+	}
 	// Draw FPS
 	const std::string fpsText = "FPS: " + std::to_string(FPS);
 	fontXs.DrawText(fpsText, Vei2{ 10, 10 }, Colors::White, gfx);

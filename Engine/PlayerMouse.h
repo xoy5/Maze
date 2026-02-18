@@ -22,11 +22,19 @@ private:
 	};
 
 public:
-	PlayerMouse(const std::string& spriteFilePath, Vec2 pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong, std::pair<int, int> tilePos)
+	PlayerMouse(const Maze& maze, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
 		:
-		Character(spriteFilePath, pos, speed, width, height, nFrames, frameHoldTime, animationPingPong),
-		tilePos(tilePos)
-	{}
+		Character(spriteFilePath, maze.GetEntrancePos(), speed, width, height, nFrames, frameHoldTime, animationPingPong),
+		tilePos(maze.GetEntranceTilePos())
+	{
+		SetStandingDirection(maze);
+	}
+	void ResetToDefault(const Maze& maze)
+	{
+		SetPos(maze.GetEntrancePos());
+		tilePos = maze.GetEntranceTilePos();
+		SetStandingDirection(maze);
+	}
 	void Draw(Graphics& gfx) const
 	{
 		Character::Draw(gfx);
@@ -88,7 +96,7 @@ public:
 		}
 
 	}
-	void SetStandingDir(const Maze& maze)
+	void SetStandingDirection(const Maze& maze)
 	{
 		auto tilePos = maze.GetEntranceTilePos();
 		if (tilePos.first == 0) Character::SetStandingDirection(GetVecFromMove(Move::Right));

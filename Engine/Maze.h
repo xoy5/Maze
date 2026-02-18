@@ -26,41 +26,11 @@ private:
 public:
 	Maze()
 	{
-		for (int i = 0; i < nTilesX * nTilesY; i++)
-		{
-			tiles[i] = Tile::Wall;
-		}
-
-		std::ifstream file("Files/Data/maze.txt");
-		assert(file && "File Error");
-
-		char c;
-		int i = 0;
-		while (file.get(c))
-		{
-			switch (c)
-			{
-			case '\n':
-				i--;
-				break;
-			case 'W':
-				tiles[i] = Tile::Wall;
-				break;
-			case 'C':
-				tiles[i] = Tile::Cheese;
-				break;
-			case 'F':
-				tiles[i] = Tile::Floor;
-				break;
-			case 'E':
-				tiles[i] = Tile::Entrance;
-				break;
-			case 'X':
-				tiles[i] = Tile::Exit;
-				break;
-			}
-			i++;
-		}
+		SetupTiles();
+	}
+	void ResetToDefault()
+	{
+		SetupTiles();
 	}
 	void Draw(Graphics& gfx) const
 	{
@@ -107,11 +77,20 @@ public:
 		}
 		return false;
 	}
-
 public:
 	bool CanEnter(std::pair<int, int> tilePos) const
 	{
 		return bool(int(GetTileAt(tilePos)) & 15); // 15 means that I choose Floor, Entrance, Exit and Cheese
+	}
+	std::pair<int, int> GetExitTilePos() const
+	{
+		for (int i = 0; i < nTilesX * nTilesY; i++)
+		{
+			if (int(tiles[i]) & int(Tile::Exit))
+				return { i % nTilesX, i / nTilesX };
+		}
+
+		assert(false && "There is no exit.");
 	}
 	std::pair<int, int> GetEntranceTilePos() const
 	{
@@ -135,6 +114,15 @@ public:
 	{
 		return RectF(Vec2{ float(tilePos.first * tileSize), float(tilePos.second * tileSize) }, float(tileSize), float(tileSize));
 	}
+	int GetNumberOfCheeses() const
+	{
+		int nOfCheese = 0;
+		for (int i = 0; i < nTilesX * nTilesY; i++)
+		{
+			if (int(tiles[i]) & int(Tile::Cheese)) nOfCheese++;
+		}
+		return nOfCheese;
+	}
 
 	int GetNumberOfTilesX() const
 	{
@@ -150,6 +138,39 @@ public:
 	}
 
 private:
+	void SetupTiles()
+	{
+		std::ifstream file("Files/Data/maze.txt");
+		assert(file && "File Error");
+
+		char c;
+		int i = 0;
+		while (file.get(c))
+		{
+			switch (c)
+			{
+			case '\n':
+				i--;
+				break;
+			case 'W':
+				tiles[i] = Tile::Wall;
+				break;
+			case 'C':
+				tiles[i] = Tile::Cheese;
+				break;
+			case 'F':
+				tiles[i] = Tile::Floor;
+				break;
+			case 'E':
+				tiles[i] = Tile::Entrance;
+				break;
+			case 'X':
+				tiles[i] = Tile::Exit;
+				break;
+			}
+			i++;
+		}
+	}
 	Tile GetTileAt(std::pair<int, int> tilePos) const
 	{
 		if (!(tilePos.first >= 0 && tilePos.first < nTilesX &&
