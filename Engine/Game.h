@@ -84,6 +84,6 @@ private:
 	/*  User Variables  */
 	Maze maze;
 	PlayerMouse playerMouse;
-	bool flag_gameEnd = false;
+	bool flagGameEnd = false;
 	/********************************/
 };
