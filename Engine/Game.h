@@ -34,8 +34,8 @@
 
 
 #include "Maze.h"
-#include "PlayerMouse.h"
-#include "Character.h"
+#include "MazeCharacter.h"
+#include "Player.h"
 
 class Game
 {
@@ -83,7 +83,7 @@ private:
 	/********************************/
 	/*  User Variables  */
 	Maze maze;
-	PlayerMouse playerMouse;
+	Player player;
 	bool flagGameEnd = false;
 	/********************************/
 };

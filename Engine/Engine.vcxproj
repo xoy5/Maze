@@ -141,7 +141,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Character.h" />
+    <ClInclude Include="MazeCharacter.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="Colors.h" />
@@ -161,8 +161,9 @@
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MouseCameraController.h" />
+    <ClInclude Include="Movement.h" />
     <ClInclude Include="MyMessageBox.h" />
-    <ClInclude Include="PlayerMouse.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />
@@ -175,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="MazeCharacter.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Movement.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Surface.cpp" />
   </ItemGroup>

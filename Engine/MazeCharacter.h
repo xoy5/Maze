@@ -3,9 +3,13 @@
 
 #include "Animation.h"
 #include "Vec2.h"
+#include "Movement.h"
+#include "Maze.h"
 
-class Character
+class MazeCharacter
 {
+	friend class Movement;
+
 private:
 	enum class Sequence
 	{
@@ -21,24 +25,39 @@ private:
 	};
 
 public:
-	Character(const std::string& spriteFilePath, const Vec2& pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
+	MazeCharacter(const Maze& maze, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong = false);
+	virtual void ResetToDefault(const Maze& maze);
 	void Draw(Graphics& gfx) const;
-	void Update(float dt);
-
+	virtual void Update(float dt, Maze& maze);
+	void SetAnimationDirection(Vec2 dir);
 	// activates a damage visual effect
 	void ActivateEffect();
 
 public:
-	void SetDirection(const Vec2& dir);
+	Vec2 GetDirection() const;
+	void SetMovementDirection(const Vec2& dir, const Maze& maze);
 	void SetStandingDirection(const Vec2& dir);
+
 	void SetPos(const Vec2& pos_in);
 	Vec2 GetPos() const;
+	std::pair<int, int> GetTilePos() const;
+	std::pair<int, int> GetNextTilePos() const;
+	void Translate(const Vec2& translate);
+
+	void SetSpeed(float speed_in);
+	float GetSpeed() const;
+	float GetDefaultSpeed() const;
+
+	void SetVelocity(Vec2 velocity_in);
+	Vec2 GetVelocity() const;
+
+	RectF GetRect() const;
 	int GetWidth() const;
 	int GetHeight() const;
-	RectF GetRect() const;
-	float GetSpeed() const;
-	void SetSpeed(float speed_in);
-	float GetDefaultSpeed() const;
+
+protected:
+	Movement movement;
+	void SetDirection(const Vec2& dir_in);
 
 private:
 	Surface sprite;

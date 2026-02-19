@@ -1,9 +1,9 @@
-#include "Character.h"
+#include "MazeCharacter.h"
 
-Character::Character(const std::string& spriteFilePath, const Vec2& pos, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
+MazeCharacter::MazeCharacter(const Maze& maze, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
 	:
+	movement(maze, *this),
 	sprite(spriteFilePath),
-	pos(pos),
 	speed(speed),
 	defaultSpeed(speed),
 	width(width),
@@ -19,7 +19,12 @@ Character::Character(const std::string& spriteFilePath, const Vec2& pos, float s
 	}
 }
 
-void Character::Draw(Graphics& gfx) const
+void MazeCharacter::ResetToDefault(const Maze& maze)
+{
+	movement.ResetToDefault(maze, *this);
+}
+
+void MazeCharacter::Draw(Graphics& gfx) const
 {
 	// if effect active, draw sprite replacing opaque pixels with red
 	if (effectActive)
@@ -32,9 +37,9 @@ void Character::Draw(Graphics& gfx) const
 	}
 }
 
-void Character::Update(float dt)
+void MazeCharacter::Update(float dt, Maze& maze)
 {
-	pos += dir * speed * dt;
+	movement.Update(dt, maze, *this);
 	animations[(int)iCurSequence].Update(dt);
 	// update effect time if active
 	if (effectActive)
@@ -48,15 +53,8 @@ void Character::Update(float dt)
 	}
 }
 
-void Character::ActivateEffect()
+void MazeCharacter::SetAnimationDirection(Vec2 dir)
 {
-	effectActive = true;
-	effectTime = 0.0f;
-}
-
-void Character::SetDirection(const Vec2& dir_in)
-{
-	dir = dir_in;
 	if (dir.x > 0.0f)
 	{
 		iCurSequence = Sequence::WalkingRight;
@@ -94,7 +92,29 @@ void Character::SetDirection(const Vec2& dir_in)
 	}
 }
 
-void Character::SetStandingDirection(const Vec2& dir)
+void MazeCharacter::ActivateEffect()
+{
+	effectActive = true;
+	effectTime = 0.0f;
+}
+
+void MazeCharacter::SetDirection(const Vec2& dir_in)
+{
+	dir = dir_in;
+	SetAnimationDirection(dir);
+}
+
+Vec2 MazeCharacter::GetDirection() const
+{
+	return dir;
+}
+
+void MazeCharacter::SetMovementDirection(const Vec2& dir, const Maze& maze)
+{
+	movement.SetDirection(dir, maze, *this);
+}
+
+void MazeCharacter::SetStandingDirection(const Vec2& dir)
 {
 	if (dir.x > 0.0f)
 	{
@@ -114,42 +134,67 @@ void Character::SetStandingDirection(const Vec2& dir)
 	}
 }
 
-void Character::SetPos(const Vec2& pos_in)
+void MazeCharacter::SetPos(const Vec2& pos_in)
 {
 	pos = pos_in;
 }
 
-Vec2 Character::GetPos() const
+Vec2 MazeCharacter::GetPos() const
 {
 	return pos;
 }
 
-int Character::GetWidth() const
+std::pair<int, int> MazeCharacter::GetTilePos() const
+{
+	return movement.GetTilePos();
+}
+
+std::pair<int, int> MazeCharacter::GetNextTilePos() const
+{
+	return movement.GetNextTilePos();
+}
+
+void MazeCharacter::Translate(const Vec2& translate)
+{
+	pos += translate;
+}
+
+int MazeCharacter::GetWidth() const
 {
 	return width;
 }
 
-int Character::GetHeight() const
+int MazeCharacter::GetHeight() const
 {
 	return height;
 }
 
-RectF Character::GetRect() const
+RectF MazeCharacter::GetRect() const
 {
 	return RectF{ pos, float(width), float(height) };
 }
 
-float Character::GetSpeed() const
+float MazeCharacter::GetSpeed() const
 {
 	return speed;
 }
 
-void Character::SetSpeed(float speed_in)
+void MazeCharacter::SetSpeed(float speed_in)
 {
 	speed = speed_in;
 }
 
-float Character::GetDefaultSpeed() const
+float MazeCharacter::GetDefaultSpeed() const
 {
 	return defaultSpeed;
+}
+
+void MazeCharacter::SetVelocity(Vec2 velocity_in)
+{
+	vel = velocity_in;
+}
+
+Vec2 MazeCharacter::GetVelocity() const
+{
+	return vel;
 }

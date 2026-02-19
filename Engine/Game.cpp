@@ -27,7 +27,7 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	playerMouse(maze, "Files/Images/Sprites/mouse.bmp", 90.0f, 40, 40, 3, 0.16f, true)
+	player(maze, "Files/Images/Sprites/mouse.bmp", 90.0f, 40, 40, 3, 0.16f, true)
 {
 	myMessageBox.SetButtons(MyMessageBox::Buttons::Ok);
 	myMessageBox.SetText("Error");
@@ -84,9 +84,8 @@ void Game::ProcessInput()
 		if (wnd.kbd.KeyIsPressed('W')) dir += {0.0f, -1.0f};
 		if (wnd.kbd.KeyIsPressed('S')) dir += {0.0f, 1.0f};
 
-		playerMouse.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
-
-		playerMouse.SetDir(dir, maze);
+		player.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
+		player.SetMovementDirection(dir, maze);
 	}
 	///////////////////////////////////////
 	///////////////////////////////////////
@@ -106,7 +105,7 @@ void Game::ProcessInput()
 				case MyMessageBox::ValueButton::Ok:
 					flagGameEnd = false;
 					maze.ResetToDefault();
-					playerMouse.ResetToDefault(maze);
+					player.ResetToDefault(maze);
 					myMessageBox.SetText("Error");
 			}
 		
@@ -119,9 +118,9 @@ void Game::UpdateModel(float dt)
 {
 	if (flagGameEnd == false)
 	{
-		playerMouse.Update(dt, maze);
-		maze.CheckAndCollectCheese(playerMouse.GetTilePos()); // If more than one player, use 'if'
-		if (maze.GetExitTilePos() == playerMouse.GetTilePos() && maze.GetNumberOfCheeses() == 0)
+		player.Update(dt, maze);
+		maze.CheckAndCollectCheese(player.GetTilePos()); // If more than one player, use 'if'
+		if (maze.GetExitTilePos() == player.GetTilePos() && maze.GetNumberOfCheeses() == 0)
 		{
 			flagGameEnd = true;
 			myMessageBox.SetText("You WIN");
@@ -132,9 +131,9 @@ void Game::UpdateModel(float dt)
 void Game::ComposeFrame()
 {
 	maze.Draw(gfx);
-	maze.DrawTileHighlightAt(gfx, playerMouse.GetTilePos(), Colors::Aqua);
-	maze.DrawTileHighlightAt(gfx, playerMouse.GetNextTilePos(), Colors::PeachPuff);
-	playerMouse.Draw(gfx);
+	maze.DrawTileHighlightAt(gfx, player.GetTilePos(), Colors::Aqua);
+	maze.DrawTileHighlightAt(gfx, player.GetNextTilePos(), Colors::PeachPuff);
+	player.Draw(gfx);
 
 	if (flagGameEnd)
 	{
