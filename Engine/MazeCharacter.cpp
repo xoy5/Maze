@@ -1,13 +1,14 @@
 #include "MazeCharacter.h"
 
-MazeCharacter::MazeCharacter(const Maze& maze, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
+MazeCharacter::MazeCharacter(const Maze& maze, const std::pair<int, int>& spawnPoint, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong, bool canTurnImmediately)
 	:
-	movement(maze, *this),
 	sprite(spriteFilePath),
 	speed(speed),
 	defaultSpeed(speed),
 	width(width),
-	height(height)
+	height(height),
+	movement(maze, spawnPoint, *this),
+	canTurnImmediately(canTurnImmediately)
 {
 	for (int i = 0; i < (int)Sequence::StandingLeft; i++)
 	{
@@ -37,7 +38,7 @@ void MazeCharacter::Draw(Graphics& gfx) const
 	}
 }
 
-void MazeCharacter::Update(float dt, Maze& maze)
+void MazeCharacter::Update(float dt, const Maze& maze)
 {
 	movement.Update(dt, maze, *this);
 	animations[(int)iCurSequence].Update(dt);
@@ -159,6 +160,11 @@ void MazeCharacter::Translate(const Vec2& translate)
 	pos += translate;
 }
 
+bool MazeCharacter::CanTurnImmediately() const
+{
+	return canTurnImmediately;
+}
+
 int MazeCharacter::GetWidth() const
 {
 	return width;
@@ -172,6 +178,11 @@ int MazeCharacter::GetHeight() const
 RectF MazeCharacter::GetRect() const
 {
 	return RectF{ pos, float(width), float(height) };
+}
+
+RectF MazeCharacter::GetHitboxRect() const
+{
+	return GetRect();
 }
 
 float MazeCharacter::GetSpeed() const

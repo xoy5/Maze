@@ -14,14 +14,14 @@ class Player : public MazeCharacter
 public:
 	Player(const Maze& maze, const std::string& spriteFilePath, float speed, int width, int height, int nFrames, float frameHoldTime, bool animationPingPong)
 		:
-		MazeCharacter(maze, spriteFilePath, speed, width, height, nFrames, frameHoldTime, animationPingPong)
+		MazeCharacter(maze, maze.GetEntranceTilePos(), spriteFilePath, speed, width, height, nFrames, frameHoldTime, animationPingPong, true)
 	{}
 	void ResetToDefault(const Maze& maze) override
 	{
 		sprintMode = false;
 		MazeCharacter::ResetToDefault(maze);
 	}
-	void Update(float dt, Maze& maze) override
+	void Update(float dt, const Maze& maze) override
 	{
 		MazeCharacter::SetSpeed(GetCurrentSpeed());
 		MazeCharacter::Update(dt, maze);
@@ -30,7 +30,10 @@ public:
 	{
 		sprintMode = active;
 	}
-
+	RectF GetHitboxRect() const
+	{
+		return GetRect().GetShrunken(15);
+	}
 private:
 	float GetCurrentSpeed() const
 	{

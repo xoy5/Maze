@@ -27,10 +27,14 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	player(maze, "Files/Images/Sprites/mouse.bmp", 90.0f, 40, 40, 3, 0.16f, true)
+	player(maze, "Files/Images/Sprites/mouse.bmp", 100.0f, 40, 40, 3, 0.16f, true),
+	enemy(maze, &player, "Files/Images/Sprites/ghost.bmp", 70.0f, 40, 40, 2, 0.08f, false)
 {
 	myMessageBox.SetButtons(MyMessageBox::Buttons::Ok);
 	myMessageBox.SetText("Error");
+
+	mazeCharacters.push_back(&player);
+	mazeCharacters.push_back(&enemy);
 }
 
 void Game::Go()
@@ -83,8 +87,8 @@ void Game::ProcessInput()
 		if (wnd.kbd.KeyIsPressed('D')) dir += {1.0f, 0.0f};
 		if (wnd.kbd.KeyIsPressed('W')) dir += {0.0f, -1.0f};
 		if (wnd.kbd.KeyIsPressed('S')) dir += {0.0f, 1.0f};
-
 		player.SetSprintMode(wnd.kbd.KeyIsPressed(VK_SPACE));
+
 		player.SetMovementDirection(dir, maze);
 	}
 	///////////////////////////////////////
@@ -105,7 +109,10 @@ void Game::ProcessInput()
 				case MyMessageBox::ValueButton::Ok:
 					flagGameEnd = false;
 					maze.ResetToDefault();
-					player.ResetToDefault(maze);
+					for (auto* mc : mazeCharacters)
+					{
+						mc->ResetToDefault(maze);
+					}
 					myMessageBox.SetText("Error");
 			}
 		
@@ -118,12 +125,23 @@ void Game::UpdateModel(float dt)
 {
 	if (flagGameEnd == false)
 	{
-		player.Update(dt, maze);
+
+		for (auto* mc : mazeCharacters)
+		{
+			mc->Update(dt, maze);
+		}
 		maze.CheckAndCollectCheese(player.GetTilePos()); // If more than one player, use 'if'
+
+
+		if (enemy.IsTargetCaught())
+		{
+			flagGameEnd = true;
+			myMessageBox.SetText("You GOT CAUGHT!");
+		}
 		if (maze.GetExitTilePos() == player.GetTilePos() && maze.GetNumberOfCheeses() == 0)
 		{
 			flagGameEnd = true;
-			myMessageBox.SetText("You WIN");
+			myMessageBox.SetText("You WIN!");
 		}
 	}
 }
@@ -131,9 +149,16 @@ void Game::UpdateModel(float dt)
 void Game::ComposeFrame()
 {
 	maze.Draw(gfx);
-	maze.DrawTileHighlightAt(gfx, player.GetTilePos(), Colors::Aqua);
-	maze.DrawTileHighlightAt(gfx, player.GetNextTilePos(), Colors::PeachPuff);
-	player.Draw(gfx);
+
+	// DEBUG
+	/*maze.DrawTileHighlightAt(gfx, player.GetTilePos(), Colors::Aqua);
+	maze.DrawTileHighlightAt(gfx, player.GetNextTilePos(), Colors::PeachPuff);*/
+
+	for (auto* mc : mazeCharacters)
+	{
+		mc->Draw(gfx);
+	}
+	
 
 	if (flagGameEnd)
 	{

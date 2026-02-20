@@ -1,19 +1,22 @@
 #include "Movement.h"
 #include "MazeCharacter.h"
 
-Movement::Movement(const Maze& maze, MazeCharacter& owner)
+Movement::Movement(const Maze& maze, const std::pair<int, int>& spawnPointTilePos, MazeCharacter& owner)
 	:
-	tilePos(maze.GetEntranceTilePos())
+	spawnPointTilePos(spawnPointTilePos),
+	tilePos(spawnPointTilePos)
 {
-	owner.SetPos(maze.GetEntrancePos());
+	owner.SetPos(maze.GetPosOfTileAt(spawnPointTilePos));
 	SetStandingDirectionBasedOnMaze(maze, owner);
 }
 
 void Movement::ResetToDefault(const Maze& maze, MazeCharacter& owner)
 {
-	tilePos = maze.GetEntranceTilePos();
-	owner.SetPos(maze.GetEntrancePos());
+	tilePos = spawnPointTilePos;
+	owner.SetPos(maze.GetPosOfTileAt(spawnPointTilePos));
 	Movement::SetStandingDirectionBasedOnMaze(maze, owner);
+	curMove = Move::No;
+	nextMove = Move::No;
 }
 
 void Movement::Update(float dt, const Maze& maze, MazeCharacter& owner)
@@ -51,7 +54,7 @@ void Movement::SetDirection(const Vec2& dir, const Maze& maze, MazeCharacter& ow
 
 
 	// Handle instantaneous 180-degree turns
-	if (IsOpposite(curMove, inputMove))
+	if ( owner.CanTurnImmediately() && IsOpposite(curMove, inputMove))
 	{
 		tilePos = GetNextTilePos();
 		curMove = inputMove;
@@ -63,16 +66,15 @@ void Movement::SetDirection(const Vec2& dir, const Maze& maze, MazeCharacter& ow
 	// Immediate move if standing still
 	if (curMove == Move::No)
 	{
+		const Vec2 moveDir = GetVecFromMove(inputMove);
 		if (maze.CanEnter(GetTilePosFromMove(tilePos, inputMove)))
 		{
 			curMove = inputMove;
-			const Vec2 moveDir = GetVecFromMove(curMove);
 			owner.SetDirection(moveDir);
-			if (inputMove == Move::Down)
-			{
-				float i = 0.0f;
-				owner.Translate(Vec2{ i,i });
-			}
+		}
+		else
+		{
+			owner.SetStandingDirection(moveDir);
 		}
 	}
 	// Queue the move to be processed at the next tile junction
@@ -84,16 +86,20 @@ void Movement::SetDirection(const Vec2& dir, const Maze& maze, MazeCharacter& ow
 
 void Movement::SetStandingDirectionBasedOnMaze(const Maze& maze, MazeCharacter& owner)
 {
-	auto tilePos = maze.GetEntranceTilePos();
-	if (tilePos.first == 0)									 owner.SetStandingDirection(GetVecFromMove(Move::Right));
-	else if (tilePos.first == maze.GetNumberOfTilesX() - 1)  owner.SetStandingDirection(GetVecFromMove(Move::Left));
-	else if (tilePos.second == maze.GetNumberOfTilesY() - 1) owner.SetStandingDirection(GetVecFromMove(Move::Up));
-	else /* if (tilePos.second == 0) obvious shit */         owner.SetStandingDirection(GetVecFromMove(Move::Down));
+	if      (spawnPointTilePos.first == 0)							   owner.SetStandingDirection(GetVecFromMove(Move::Right));
+	else if (spawnPointTilePos.first == maze.GetNumberOfTilesX() - 1)  owner.SetStandingDirection(GetVecFromMove(Move::Left));
+	else if (spawnPointTilePos.second == maze.GetNumberOfTilesY() - 1) owner.SetStandingDirection(GetVecFromMove(Move::Up));
+	else /* if (tilePos.second == 0) or other case */                  owner.SetStandingDirection(GetVecFromMove(Move::Down));
 }
 
 bool Movement::IsMoving() const
 {
 	return curMove != Move::No;
+}
+
+bool Movement::IsNextMoveReserved() const
+{
+	return nextMove != Move::No;
 }
 
 bool Movement::IsOpposite(Move a, Move b) const
@@ -130,7 +136,7 @@ Vec2 Movement::GetVecFromMove(Move m) const
 	}
 }
 
-Movement::Move Movement::GetMoveFromVec(Vec2 v) const
+Movement::Move Movement::GetMoveFromVec(const Vec2& v) const
 {
 	// x axis
 	if (v.x < 0.0f && !(curMove == Move::Left && v.y != 0.0f /* Leetcode Kira 210IQ */)) return Move::Left;
@@ -140,6 +146,14 @@ Movement::Move Movement::GetMoveFromVec(Vec2 v) const
 	else if (v.y > 0.0f) return Move::Down;
 
 	return Move::No;
+}
+
+Vec2 Movement::GetDirectionFromTiles(const std::pair<int, int>& firstPosTile, const std::pair<int, int>& secondPosTile)
+{
+	return {
+		float(secondPosTile.first - firstPosTile.first),
+		float(secondPosTile.second - firstPosTile.second)
+	};
 }
 
 std::pair<int, int> Movement::GetTilePos() const
