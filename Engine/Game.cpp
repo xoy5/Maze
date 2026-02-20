@@ -151,8 +151,10 @@ void Game::ComposeFrame()
 	maze.Draw(gfx);
 
 	// DEBUG
-	/*maze.DrawTileHighlightAt(gfx, player.GetTilePos(), Colors::Aqua);
-	maze.DrawTileHighlightAt(gfx, player.GetNextTilePos(), Colors::PeachPuff);*/
+	//maze.DrawTileHighlightAt(gfx, player.GetTilePos(), Colors::Aqua);
+	//maze.DrawTileHighlightAt(gfx, player.GetNextTilePos(), Colors::PeachPuff);
+	//maze.DrawTileHighlightAt(gfx, enemy.GetTilePos(), Colors::Aqua);
+	//maze.DrawTileHighlightAt(gfx, enemy.GetNextTilePos(), Colors::PeachPuff);
 
 	for (auto* mc : mazeCharacters)
 	{
@@ -164,8 +166,11 @@ void Game::ComposeFrame()
 	{
 		myMessageBox.Draw(gfx);
 	}
+
 	// Draw FPS
 	const std::string fpsText = "FPS: " + std::to_string(FPS);
 	fontXs.DrawText(fpsText, Vei2{ 10, 10 }, Colors::White, gfx);
-
+	// Algorithm run count
+	const std::string tarText = "ARC: " + std::to_string(enemy.GetAlgorithmRunCount());
+	fontXs.DrawText(tarText, Vei2{ 10, 10 + fontXs.GetHeightChar() + 2 }, Colors::White, gfx);
 }

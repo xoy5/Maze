@@ -44,7 +44,10 @@ public:
     {
         return GetRect().GetShrunken(10);
     }
-
+    int GetAlgorithmRunCount() const
+    {
+        return algorithmRunCount;
+    }
 private:
     void CalculateAndSetDirection(const Maze& maze)
     {
@@ -52,6 +55,7 @@ private:
         {
             if (movement.IsMoving() == false)
             {
+                algorithmRunCount++;
                 const auto currentPosTile = GetTilePos();
                 const auto targetPosTile = pTarget->GetTilePos();
 
@@ -62,6 +66,7 @@ private:
             }
             if (movement.IsNextMoveReserved() == false)
             {
+                algorithmRunCount++;
                 const auto nextPosTile = GetNextTilePos();
                 const auto targetPosTile = pTarget->GetTilePos();
 
@@ -125,4 +130,5 @@ private:
 private:
 	const MazeCharacter* pTarget = nullptr;
     bool isTargetCaught = false;
+    int algorithmRunCount = 0;
 };
