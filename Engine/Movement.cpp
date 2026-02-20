@@ -188,6 +188,7 @@ bool Movement::IsMovedToNextTile(const Maze& maze, MazeCharacter& owner)
 	case Move::Down:
 		return ownerRect.top >= nextTileRect.top;
 	case Move::No:
+	default:
 		return true;
 	}
 }

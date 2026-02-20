@@ -91,6 +91,7 @@ public:
 		}
 
 		assert(false && "There is no exit.");
+		return {-1,-1};
 	}
 	std::pair<int, int> GetEntranceTilePos() const
 	{
@@ -101,6 +102,7 @@ public:
 		}
 
 		assert(false && "There is no entrance.");
+		return {-1,-1};
 	}
 	Vec2 GetEntrancePos() const
 	{
